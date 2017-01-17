@@ -5,7 +5,7 @@ import socket, sys, urllib2;
 ###################
 ## Configuration ##
 ###################
-IBOX_IP = "192.168.1.18"        # iBox IP address
+IBOX_IP = "192.168.0.34"        # iBox IP address
 UDP_PORT_SEND = 5987            # Port for sending
 UDP_PORT_RECEIVE = 55054        # Port for receiving
 UDP_MAX_TRY = 5                 # Max sending max value is 256
@@ -74,8 +74,8 @@ def iBoxV6Commands(x):
         "RGBWDIM50"      : "31 00 00 07 02 32 00 00 00",
         "RGBWDIM75"      : "31 00 00 07 02 10 00 00 00",
         "RGBWDIM100"     : "31 00 00 07 02 00 00 00 00",
-        "LEDON"          : "31 00 00 00 03 04 00 00 00",
-        "LEDOFF"         : "31 00 00 00 03 03 00 00 00",
+        "LEDON"          : "31 00 00 00 03 03 00 00 00",
+        "LEDOFF"         : "31 00 00 00 03 04 00 00 00",
         "LEDDIM00"       : "31 00 00 00 02 64 00 00 00",
         "LEDDIM25"       : "31 00 00 00 02 4B 00 00 00",
         "LEDDIM50"       : "31 00 00 00 02 32 00 00 00",
@@ -124,10 +124,10 @@ CMDLINE_INFO = (
 "                           : CMD2 Bulb command\n"
 "-------------------------------------------------------------------------------\n"
 "Select the bulb zone       : 00 01 02 03 04\n"
-"Bulb on/off                : ON OFF NIGHTON WHITEON\n"
+"Bulb on/off                : ON OFF NIGHTON WHITEON RGBWON RGBWOFF LEDON LEDOFF\n"
 "Mode Speed up/down         : SPEEDUP SPEEDDOWN\n"
 "Kelvin warmwhite           : WW00 WW25 WW50 WW75 WW100\n"
-"Brightness                 : DIM00 DIM25 DIM50 DIM75 DIM100\n"
+"Brightness                 : DIM00 DIM25 DIM50 DIM75 DIM100 LEDDIMxx RGBWDIMxx\n"
 "Saturation                 : SATUR00 SATUR25 SATUR50 SATUR75 SATUR100\n"
 "Mode (discomode)           : MODE01 MODE02 MODE03 MODE04 MODE05\n"
 "                           : MODE06 MODE07 MODE08 MODE09\n"
