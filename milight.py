@@ -13,6 +13,7 @@ UDP_TIMEOUT = 5                 # Wait for data in sec
 DOMOTICZ_IP = "192.168.0.35"    # Domoticz IP only needed for logging
 DOMOTICZ_PORT = "80"            # Domoticz port only needed for logging
 DOMOTICZ_LOG = 0                # Turn logging to Domoticz on/off 0=off and 1=on
+live=False
 ############################################################################################################
 
 
@@ -23,16 +24,14 @@ def doLog(MSG):
     try:
         if DOMOTICZ_LOG == 1:
             urllib2.urlopen("http://"+DOMOTICZ_IP+":"+DOMOTICZ_PORT+"/json.htm?type=command&param=addlogmessage&message="+MSG.replace(" ", "%20")).read()
-
+        else :
+            print "DEBUG ", MSG
     except Exception as ex:
         print "[DEBUG] log error                :", ex 
 
 
-######################
-## iBox v6 commands ##
-######################
-def iBoxV6Commands(x):
-    return {
+
+rawcommands ={
 		"COLOR001"       : "31 00 00 08 01 BA BA BA BA",
 		"COLOR002"       : "31 00 00 08 01 FF FF FF FF",
 		"COLOR003"       : "31 00 00 08 01 7A 7A 7A 7A",
@@ -80,9 +79,34 @@ def iBoxV6Commands(x):
         "LEDDIM25"       : "31 00 00 00 02 4B 00 00 00",
         "LEDDIM50"       : "31 00 00 00 02 32 00 00 00",
         "LEDDIM75"       : "31 00 00 00 02 10 00 00 00",
-        "LEDDIM100"      : "31 00 00 00 02 00 00 00 00",
+        "LEDDIM100"      : "31 00 00 00 02 00 00 00 00"
+}
 
-	}.get(x)
+varcommands={
+    "RGBWBRIGHT" : "31 00 00 07 02 ",
+    "LEDBRIGHT"  : "31 00 00 00 02 ",
+}
+
+
+# Commands to turn the lights of with dimming so that when you turn them on they don't blind you
+# will require a speed variable (step size), and delay (time between commands)
+dimoffcommands={
+    "RGBWRAMP" : ["RGBWBRIGHT","RGBWOFF"],
+    "LEDRAMP" : ["LEDBRIGHT","LEDOFF"]
+}
+
+######################
+## iBox v6 commands ##
+######################
+def iBoxV6Commands(x, value):
+    if x in rawcommands:
+        return rawcommands.get(x)
+    if x in varcommands:
+        print "Variable command ", x , value
+        retval=varcommands.get(x)+ hex(value)[2:] + " 00 00 00"
+        print "Trying ", retval
+        return retval
+	
 
                                                                                     
 ##################
@@ -140,6 +164,20 @@ try:
 
     CMDLINE_CMD = sys.argv[2].strip()
     print "[DEBUG] start command2           :", CMDLINE_CMD
+    
+    if(CMDLINE_CMD in varcommands):
+        CMDLINE_VALUE1 = int(sys.argv[3].strip())
+        print "[DEBUG] start command3           :", CMDLINE_VALUE1
+    else:
+        CMDLINE_VALUE1=0
+    if(CMDLINE_CMD in dimoffcommands):
+        CMDLINE_VALUESPEED = int(sys.argv[3].strip())
+        print "[DEBUG] start command3           :", CMDLINE_VALUESPEED
+        CMDLINE_DELAY = int(sys.argv[4].strip())
+        print "[DEBUG] start command4           :", CMDLINE_DELAY
+        
+    else:
+        CMDLINE_VALUESPEED=0
 
 except:
     print CMDLINE_INFO
@@ -155,15 +193,21 @@ for iCount in range(0, UDP_MAX_TRY):
     try:
         START_SESSION = "20 00 00 00 16 02 62 3A D5 ED A3 01 AE 08 2D 46 61 41 A7 F6 DC AF D3 E6 00 00 1E"
         doLog("Milight Script: Setting up ibox session...")
-        sockServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sockServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sockServer.bind(('', UDP_PORT_RECEIVE))
-        sockServer.settimeout(UDP_TIMEOUT)
-        sockServer.sendto(bytearray.fromhex(START_SESSION), (IBOX_IP, UDP_PORT_SEND))
-        dataReceived, addr = sockServer.recvfrom(1024)
-        dataResponse = str(dataReceived.encode('hex')).upper()
-        SessionID1 = dataResponse[38:40]
-        SessionID2 = dataResponse[40:42]
+        if live==True:
+            sockServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sockServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sockServer.bind(('', UDP_PORT_RECEIVE))
+            sockServer.settimeout(UDP_TIMEOUT)
+            sockServer.sendto(bytearray.fromhex(START_SESSION), (IBOX_IP, UDP_PORT_SEND))
+            dataReceived, addr = sockServer.recvfrom(1024)
+            dataResponse = str(dataReceived.encode('hex')).upper()
+            SessionID1 = dataResponse[38:40]
+            SessionID2 = dataResponse[40:42]
+        else:
+            doLog("Fake it")
+            dataResponse= " No server so faking it"
+            SessionID1 = "BA"
+            SessionID2 = "BE"
         print "[DEBUG] received session message :", dataResponse
         print "[DEBUG] sessionID1               :", SessionID1
         print "[DEBUG] sessionID2               :", SessionID2
@@ -190,7 +234,7 @@ if Session == True:
             CycleNR = format(iCount, "04X")[2:]
             print "[DEBUG] cycle number             :", CycleNR
 
-            bulbCommand = iBoxV6Commands(CMDLINE_CMD)
+            bulbCommand = iBoxV6Commands(CMDLINE_CMD , CMDLINE_VALUE1)
             print "[DEBUG] light command            :", bulbCommand
 
             useZone = getZone(CMDLINE_ZONE)
@@ -202,12 +246,12 @@ if Session == True:
             sendCommand = V6CommandBuilder(SessionID1, SessionID2, CycleNR, bulbCommand, useZone, Checksum)                     
             print "[DEBUG] sending command          :", sendCommand
             doLog("Milight Script: Sending command: " + sendCommand)
-
-            sockServer.sendto(bytearray.fromhex(sendCommand), (IBOX_IP, UDP_PORT_SEND))
-            dataReceived, addr = sockServer.recvfrom(1024)
-            dataResponse = str(dataReceived.encode('hex')).upper()
-            print "[DEBUG] received message         :", dataResponse
-            doLog("Milight Script: Receiving response: " + dataResponse)
+            if live:
+                sockServer.sendto(bytearray.fromhex(sendCommand), (IBOX_IP, UDP_PORT_SEND))
+                dataReceived, addr = sockServer.recvfrom(1024)
+                dataResponse = str(dataReceived.encode('hex')).upper()
+                print "[DEBUG] received message         :", dataResponse
+                doLog("Milight Script: Receiving response: " + dataResponse)
             break
 
         except socket.timeout:
@@ -220,9 +264,11 @@ if Session == True:
             doLog("Milight Script: Something's wrong with te command...")
 
         finally:
-            sockServer.close()
+            if live:
+                sockServer.close()
 else:
-    sockServer.close()
+    if live:
+        sockServer.close()
 
 doLog("Milight Script: Ready...")
 
