@@ -13,7 +13,7 @@ UDP_TIMEOUT = 5                 # Wait for data in sec
 DOMOTICZ_IP = "192.168.0.35"    # Domoticz IP only needed for logging
 DOMOTICZ_PORT = "80"            # Domoticz port only needed for logging
 DOMOTICZ_LOG = 0                # Turn logging to Domoticz on/off 0=off and 1=on
-live=False
+live=True
 ############################################################################################################
 
 
@@ -103,7 +103,7 @@ def iBoxV6Commands(x, value):
         return rawcommands.get(x)
     if x in varcommands:
         print "Variable command ", x , value
-        retval=varcommands.get(x)+ hex(value)[2:] + " 00 00 00"
+        retval=varcommands.get(x)+ format(value, "04X")[2:] + " 00 00 00"
         print "Trying ", retval
         return retval
 	
