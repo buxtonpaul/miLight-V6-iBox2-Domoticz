@@ -79,8 +79,23 @@ rawcommands ={
         "LEDDIM25"       : "31 00 00 00 02 4B 00 00 00",
         "LEDDIM50"       : "31 00 00 00 02 32 00 00 00",
         "LEDDIM75"       : "31 00 00 00 02 10 00 00 00",
-        "LEDDIM100"      : "31 00 00 00 02 00 00 00 00"
+        "LEDDIM100"      : "31 00 00 00 02 00 00 00 00",
+        "WHITEON"        : "31 00 00 01 01 07 00 00 00",
+        "WHITEOFF"       : "31 00 00 01 01 08 00 00 00",
+        "WHITENIGHT"     : "31 00 00 01 01 06 00 00 00"
+
 }
+
+
+
+
+'''
+	// Dual white bulb commands
+	'whiteBrightnessInc' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0xFF), //
+	'whiteBrightnessDec' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0xFF), //
+	'whiteKelvinInc' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0xFF), //
+	'whiteKelvinDec' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x04, 0x00, 0x00, 0x00, 0x04, 0x00, 0xFF) //
+'''
 
 varcommands={
     "RGBWBRIGHT" : "31 00 00 07 02 ",
