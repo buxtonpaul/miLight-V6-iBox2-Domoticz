@@ -13,7 +13,7 @@ UDP_TIMEOUT = 5                 # Wait for data in sec
 DOMOTICZ_IP = "192.168.0.35"    # Domoticz IP only needed for logging
 DOMOTICZ_PORT = "80"            # Domoticz port only needed for logging
 DOMOTICZ_LOG = 0                # Turn logging to Domoticz on/off 0=off and 1=on
-live=True
+live=False
 ############################################################################################################
 
 
@@ -32,96 +32,93 @@ def doLog(MSG):
 
 
 rawcommands ={
-		"COLOR001"       : "31 00 00 08 01 BA BA BA BA",
-		"COLOR002"       : "31 00 00 08 01 FF FF FF FF",
-		"COLOR003"       : "31 00 00 08 01 7A 7A 7A 7A",
-		"COLOR004"       : "31 00 00 08 01 1E 1E 1E 1E",
-		"SATUR00"        : "31 00 00 08 02 64 00 00 00",
-		"SATUR25"        : "31 00 00 08 02 4B 00 00 00",
-		"SATUR50"        : "31 00 00 08 02 32 00 00 00",
-		"SATUR75"        : "31 00 00 08 02 19 00 00 00",
-		"SATUR100"       : "31 00 00 08 02 00 00 00 00",
-		"DIM00"          : "31 00 00 08 03 64 00 00 00",
-		"DIM25"          : "31 00 00 08 03 4B 00 00 00",
-		"DIM50"          : "31 00 00 08 03 32 00 00 00",
-		"DIM75"          : "31 00 00 08 03 19 00 00 00",
-		"DIM100"         : "31 00 00 08 03 00 00 00 00",
-		"ON"             : "31 00 00 08 04 01 00 00 00",
-		"OFF"            : "31 00 00 08 04 02 00 00 00",
-		"SPEEDUP"        : "31 00 00 08 04 03 00 00 00",
-		"SPEEDDOWN"      : "31 00 00 08 04 04 00 00 00",
-		"NIGHTON"        : "31 00 00 08 04 05 00 00 00",
-		"WHITEON"        : "31 00 00 08 05 64 00 00 00",
-		"WW00"           : "31 00 00 08 05 64 00 00 00",
-		"WW25"           : "31 00 00 08 05 4B 00 00 00",
-		"WW50"           : "31 00 00 08 05 32 00 00 00",
-		"WW75"           : "31 00 00 08 05 19 00 00 00",
-		"WW100"          : "31 00 00 08 05 00 00 00 00",
-		"MODE01"         : "31 00 00 08 06 01 00 00 00",
-		"MODE02"         : "31 00 00 08 06 02 00 00 00",
-		"MODE03"         : "31 00 00 08 06 03 00 00 00",
-		"MODE04"         : "31 00 00 08 06 04 00 00 00",
-		"MODE05"         : "31 00 00 08 06 05 00 00 00",
-		"MODE06"         : "31 00 00 08 06 06 00 00 00",
-		"MODE07"         : "31 00 00 08 06 07 00 00 00",
-		"MODE08"         : "31 00 00 08 06 08 00 00 00",
-		"MODE09"         : "31 00 00 08 06 09 00 00 00",
-        "RGBWON"         : "31 00 00 07 03 01 00 00 00",
-        "RGBWOFF"        : "31 00 00 07 03 02 00 00 00",
-        "RGBWDIM00"      : "31 00 00 07 02 64 00 00 00",
-        "RGBWDIM25"      : "31 00 00 07 02 4B 00 00 00",
-        "RGBWDIM50"      : "31 00 00 07 02 32 00 00 00",
-        "RGBWDIM75"      : "31 00 00 07 02 10 00 00 00",
-        "RGBWDIM100"     : "31 00 00 07 02 00 00 00 00",
-        "LEDON"          : "31 00 00 00 03 03 00 00 00",
-        "LEDOFF"         : "31 00 00 00 03 04 00 00 00",
-        "LEDDIM00"       : "31 00 00 00 02 64 00 00 00",
-        "LEDDIM25"       : "31 00 00 00 02 4B 00 00 00",
-        "LEDDIM50"       : "31 00 00 00 02 32 00 00 00",
-        "LEDDIM75"       : "31 00 00 00 02 10 00 00 00",
-        "LEDDIM100"      : "31 00 00 00 02 00 00 00 00",
-        "WHITEON"        : "31 00 00 01 01 07 00 00 00",
-        "WHITEOFF"       : "31 00 00 01 01 08 00 00 00",
-        "WHITENIGHT"     : "31 00 00 01 01 06 00 00 00"
+		"COLOR001"       : "31 00 00 08 01 BA BA BA BA", # original
+		"COLOR002"       : "31 00 00 08 01 FF FF FF FF", # original
+		"COLOR003"       : "31 00 00 08 01 7A 7A 7A 7A", # original
+		"COLOR004"       : "31 00 00 08 01 1E 1E 1E 1E", # original
+		"ON"             : "31 00 00 08 04 01 00 00 00", # original
+		"OFF"            : "31 00 00 08 04 02 00 00 00", # original
+		"SPEEDUP"        : "31 00 00 08 04 03 00 00 00", # original
+		"SPEEDDOWN"      : "31 00 00 08 04 04 00 00 00", # original
+		"RGBNIGHTON"     : "31 00 00 08 04 05 00 00 00", # original
+		"RGBWHITEON"     : "31 00 00 08 05 64 00 00 00",# original
+		"WW00"           : "31 00 00 08 05 64 00 00 00",# original
+		"WW25"           : "31 00 00 08 05 4B 00 00 00",# original
+		"WW50"           : "31 00 00 08 05 32 00 00 00",# original
+		"WW75"           : "31 00 00 08 05 19 00 00 00",# original
+		"WW100"          : "31 00 00 08 05 00 00 00 00",# original
+        "RGBWON"         : "31 00 00 07 03 01 00 00 00", # works
+        "RGBWOFF"        : "31 00 00 07 03 02 00 00 00", # works
+        "LEDON"          : "31 00 00 00 03 03 00 00 00", # works
+        "LEDOFF"         : "31 00 00 00 03 04 00 00 00", # works
+        "WHITEON"        : "31 00 00 01 01 07 00 00 00", # works
+        "WHITEOFF"       : "31 00 00 01 01 08 00 00 00", # works
+        "WHITENIGHT"     : "31 00 00 01 01 06 00 00 00", # works
+		"RGBWNIGHTON"    : "31 00 00 07 03 06 00 00 00", # works -- light goes off...
+		"RGBWWHITEON"    : "31 00 00 07 03 05 00 00 00", # works
+        "LEDWIGHTON"     : "31 00 00 03 05 00 00 00 00", #  untested
 
 }
 
 
+###
+# Lets start a tidied way of accessing commands rather than one big list
+rgbwcommands= {"ON":    "31 00 00 07 03 01 00 00 00",
+    "OFF":   "31 00 00 07 03 02 00 00 00",
+    "NIGHT": "31 00 00 07 03 06 00 00 00",
+    "WHITE": "31 00 00 07 03 05 00 00 00"
+}
 
+rgbwvarcommands = {
+    "BRIGHT"   :  "31 00 00 07 02 ",
+    "MODE"     :  "31 00 00 07 04 "
+}
+
+
+bridgecommands = {
+    "ON":    "31 00 00 00 03 03 00 00 00",
+    "OFF":   "31 00 00 00 03 04 00 00 00",
+    "WHITE": "31 00 00 00 03 05 00 00 00"
+}
+
+bridgevarcommands = {
+    "BRIGHT"   :  "31 00 00 00 02 ",
+    "MODE"     :  "31 00 00 00 04 "
+}
 
 '''
-	// Dual white bulb commands
-	'whiteBrightnessInc' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0xFF), //
-	'whiteBrightnessDec' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0xFF), //
-	'whiteKelvinInc' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0xFF), //
-	'whiteKelvinDec' => array( 0x31, 0x00, 0x00, 0x01, 0x01, 0x04, 0x00, 0x00, 0x00, 0x04, 0x00, 0xFF) //
-'''
-
 varcommands={
-    "RGBWBRIGHT" : "31 00 00 07 02 ",
-    "LEDBRIGHT"  : "31 00 00 00 02 ",
+    "RGBBRIGHT"  : "31 00 00 08 03 ", #  untested
+    "LEDBRIGHT"  : "31 00 00 00 02 ", # works
+    "RGBMODE"    : "31 00 00 08 06 ", # original
+    "LEDMODE"    : "31 00 00 00 04 ", # untested
+    "RGBSAT"     : "31 00 00 08 02 ", #  untested
 }
-
-
-# Commands to turn the lights of with dimming so that when you turn them on they don't blind you
-# will require a speed variable (step size), and delay (time between commands)
-dimoffcommands={
-    "RGBWRAMP" : ["RGBWBRIGHT","RGBWOFF"],
-    "LEDRAMP" : ["LEDBRIGHT","LEDOFF"]
-}
+'''
+devices = {
+    "BRIDGE" : [bridgecommands,bridgevarcommands], 
+    "RGBW" : [rgbwcommands,rgbwvarcommands],
+    "RAWCOMMANDS" : [rawcommands]
+    } 
 
 ######################
 ## iBox v6 commands ##
 ######################
-def iBoxV6Commands(x, value):
-    if x in rawcommands:
-        return rawcommands.get(x)
-    if x in varcommands:
-        print "Variable command ", x , value
-        retval=varcommands.get(x)+ format(value, "04X")[2:] + " 00 00 00"
+
+def iBoxV6Commands(device, cmd, value):
+    if cmd in devices[device][0]:
+        return devices[device][0].get(cmd)
+    if device=='RAWCOMMANDS':
+        print 'COmmand not found'
+        return 0
+    if cmd in devices[device][1]:
+        print "Variable command ", cmd , value
+        retval=devices[device][1].get(cmd)+ format(value, "04X")[2:] + " 00 00 00"
         print "Trying ", retval
         return retval
-	
+    print 'COmmand not found'
+    return 0
+    
 
                                                                                     
 ##################
@@ -158,7 +155,7 @@ CMDLINE_INFO = (
 "##########################\n"
 "## Command line options ##\n"
 "##########################\n"
-"Use command line as follow : milight.py CMD1 CMD2\n"
+"Use command line as follow : milight.py DEVICE ZONE CMD <param>\n"
 "                           : CMD1 Bulb zone\n"
 "                           : CMD2 Bulb command\n"
 "-------------------------------------------------------------------------------\n"
@@ -166,7 +163,7 @@ CMDLINE_INFO = (
 "Bulb on/off                : ON OFF NIGHTON WHITEON RGBWON RGBWOFF LEDON LEDOFF\n"
 "Mode Speed up/down         : SPEEDUP SPEEDDOWN\n"
 "Kelvin warmwhite           : WW00 WW25 WW50 WW75 WW100\n"
-"Brightness                 : DIM00 DIM25 DIM50 DIM75 DIM100 LEDDIMxx RGBWDIMxx\n"
+"Brightness                 : LEDBRIGHT xx RGBWBRIGHT xx\n"
 "Saturation                 : SATUR00 SATUR25 SATUR50 SATUR75 SATUR100\n"
 "Mode (discomode)           : MODE01 MODE02 MODE03 MODE04 MODE05\n"
 "                           : MODE06 MODE07 MODE08 MODE09\n"
@@ -174,26 +171,30 @@ CMDLINE_INFO = (
 )
 
 try:
-    CMDLINE_ZONE = sys.argv[1].strip()
-    print "[DEBUG] start command1           :", CMDLINE_ZONE
-
-    CMDLINE_CMD = sys.argv[2].strip()
-    print "[DEBUG] start command2           :", CMDLINE_CMD
+    CMDLINE_DEVICE = sys.argv[1].strip()
+    print "[DEBUG] target           :", CMDLINE_DEVICE
     
-    if(CMDLINE_CMD in varcommands):
-        CMDLINE_VALUE1 = int(sys.argv[3].strip())
-        print "[DEBUG] start command3           :", CMDLINE_VALUE1
-    else:
-        CMDLINE_VALUE1=0
-    if(CMDLINE_CMD in dimoffcommands):
-        CMDLINE_VALUESPEED = int(sys.argv[3].strip())
-        print "[DEBUG] start command3           :", CMDLINE_VALUESPEED
-        CMDLINE_DELAY = int(sys.argv[4].strip())
-        print "[DEBUG] start command4           :", CMDLINE_DELAY
-        
-    else:
-        CMDLINE_VALUESPEED=0
+    CMDLINE_ZONE = sys.argv[2].strip()
+    print "[DEBUG] ZONE           :", CMDLINE_ZONE
 
+    CMDLINE_CMD = sys.argv[3].strip()
+    print "[DEBUG] CMD           :", CMDLINE_CMD
+    
+    CMDLINE_VALUE1 = 0
+    ## check the device exists
+    if CMDLINE_DEVICE in devices:
+        print "using device ", CMDLINE_DEVICE
+    else:
+        print "no device found matching", CMDLINE_DEVICE
+        raise # some form of error occurred
+  
+    if CMDLINE_CMD in devices[CMDLINE_DEVICE][0]:
+         print " Static command found ", CMDLINE_CMD
+    elif(CMDLINE_CMD in devices[CMDLINE_DEVICE][1]):
+        CMDLINE_VALUE1 = int(sys.argv[4].strip())
+        print "[DEBUG] variable command vound           :",CMDLINE_CMD, CMDLINE_VALUE1
+    
+  
 except:
     print CMDLINE_INFO
     raise SystemExit()
@@ -249,7 +250,7 @@ if Session == True:
             CycleNR = format(iCount, "04X")[2:]
             print "[DEBUG] cycle number             :", CycleNR
 
-            bulbCommand = iBoxV6Commands(CMDLINE_CMD , CMDLINE_VALUE1)
+            bulbCommand = iBoxV6Commands(CMDLINE_DEVICE ,CMDLINE_CMD , CMDLINE_VALUE1)
             print "[DEBUG] light command            :", bulbCommand
 
             useZone = getZone(CMDLINE_ZONE)
