@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import socket, sys, urllib2;
+import socket, sys, urllib2
 
 
 ###################
@@ -13,68 +13,90 @@ UDP_TIMEOUT = 5                 # Wait for data in sec
 DOMOTICZ_IP = "192.168.0.35"    # Domoticz IP only needed for logging
 DOMOTICZ_PORT = "80"            # Domoticz port only needed for logging
 DOMOTICZ_LOG = 0                # Turn logging to Domoticz on/off 0=off and 1=on
-live=False
-############################################################################################################
+live = False
+###############################################################################################
 
 
-#####################	
+#####################
 ## Log to Domoticz ##
 #####################
 def doLog(MSG):
+    ''' Log a message to Domoticz'''
     try:
         if DOMOTICZ_LOG == 1:
-            urllib2.urlopen("http://"+DOMOTICZ_IP+":"+DOMOTICZ_PORT+"/json.htm?type=command&param=addlogmessage&message="+MSG.replace(" ", "%20")).read()
-        else :
+            urllib2.urlopen("http://"+DOMOTICZ_IP+":"+DOMOTICZ_PORT+
+                            "/json.htm?type=command&param=addlogmessage&message="
+                            +MSG.replace(" ", "%20")).read()
+        else:
             print "DEBUG ", MSG
     except Exception as ex:
-        print "[DEBUG] log error                :", ex 
+        print "[DEBUG] log error                :", ex
 
-
-
-rawcommands ={
-		"COLOR001"       : "31 00 00 08 01 BA BA BA BA", # original
-		"COLOR002"       : "31 00 00 08 01 FF FF FF FF", # original
-		"COLOR003"       : "31 00 00 08 01 7A 7A 7A 7A", # original
-		"COLOR004"       : "31 00 00 08 01 1E 1E 1E 1E", # original
-		"ON"             : "31 00 00 08 04 01 00 00 00", # original
-		"OFF"            : "31 00 00 08 04 02 00 00 00", # original
-		"SPEEDUP"        : "31 00 00 08 04 03 00 00 00", # original
-		"SPEEDDOWN"      : "31 00 00 08 04 04 00 00 00", # original
-		"RGBNIGHTON"     : "31 00 00 08 04 05 00 00 00", # original
-		"RGBWHITEON"     : "31 00 00 08 05 64 00 00 00",# original
-		"WW00"           : "31 00 00 08 05 64 00 00 00",# original
-		"WW25"           : "31 00 00 08 05 4B 00 00 00",# original
-		"WW50"           : "31 00 00 08 05 32 00 00 00",# original
-		"WW75"           : "31 00 00 08 05 19 00 00 00",# original
-		"WW100"          : "31 00 00 08 05 00 00 00 00",# original
-        "RGBWON"         : "31 00 00 07 03 01 00 00 00", # works
-        "RGBWOFF"        : "31 00 00 07 03 02 00 00 00", # works
-        "LEDON"          : "31 00 00 00 03 03 00 00 00", # works
-        "LEDOFF"         : "31 00 00 00 03 04 00 00 00", # works
-        "WHITEON"        : "31 00 00 01 01 07 00 00 00", # works
-        "WHITEOFF"       : "31 00 00 01 01 08 00 00 00", # works
-        "WHITENIGHT"     : "31 00 00 01 01 06 00 00 00", # works
-		"RGBWNIGHTON"    : "31 00 00 07 03 06 00 00 00", # works -- light goes off...
-		"RGBWWHITEON"    : "31 00 00 07 03 05 00 00 00", # works
-        "LEDWIGHTON"     : "31 00 00 03 05 00 00 00 00", #  untested
-
+rawcommands = {
+    "COLOR001"       : "31 00 00 08 01 BA BA BA BA",
+    "COLOR002"       : "31 00 00 08 01 FF FF FF FF",
+    "COLOR003"       : "31 00 00 08 01 7A 7A 7A 7A",
+    "COLOR004"       : "31 00 00 08 01 1E 1E 1E 1E",
+    "SATUR00"        : "31 00 00 08 02 64 00 00 00",
+    "SATUR25"        : "31 00 00 08 02 4B 00 00 00",
+    "SATUR50"        : "31 00 00 08 02 32 00 00 00",
+    "SATUR75"        : "31 00 00 08 02 19 00 00 00",
+    "SATUR100"       : "31 00 00 08 02 00 00 00 00",
+    "DIM00"          : "31 00 00 08 03 64 00 00 00",
+    "DIM25"          : "31 00 00 08 03 4B 00 00 00",
+    "DIM50"          : "31 00 00 08 03 32 00 00 00",
+    "DIM75"          : "31 00 00 08 03 19 00 00 00",
+    "DIM100"         : "31 00 00 08 03 00 00 00 00",
+    "ON"             : "31 00 00 08 04 01 00 00 00",
+    "OFF"            : "31 00 00 08 04 02 00 00 00",
+    "SPEEDUP"        : "31 00 00 08 04 03 00 00 00",
+    "SPEEDDOWN"      : "31 00 00 08 04 04 00 00 00",
+    "NIGHTON"        : "31 00 00 08 04 05 00 00 00",
+    "WHITEON"        : "31 00 00 08 05 64 00 00 00",
+    "WW00"           : "31 00 00 08 05 64 00 00 00",
+    "WW25"           : "31 00 00 08 05 4B 00 00 00",
+    "WW50"           : "31 00 00 08 05 32 00 00 00",
+    "WW75"           : "31 00 00 08 05 19 00 00 00",
+    "WW100"          : "31 00 00 08 05 00 00 00 00",
+    "MODE01"         : "31 00 00 08 06 01 00 00 00",
+    "MODE02"         : "31 00 00 08 06 02 00 00 00",
+    "MODE03"         : "31 00 00 08 06 03 00 00 00",
+    "MODE04"         : "31 00 00 08 06 04 00 00 00",
+    "MODE05"         : "31 00 00 08 06 05 00 00 00",
+    "MODE06"         : "31 00 00 08 06 06 00 00 00",
+    "MODE07"         : "31 00 00 08 06 07 00 00 00",
+    "MODE08"         : "31 00 00 08 06 08 00 00 00",
+    "MODE09"         : "31 00 00 08 06 09 00 00 00"
 }
 
 
 ###
 # Lets start a tidied way of accessing commands rather than one big list
-rgbwcommands= {"ON":    "31 00 00 07 03 01 00 00 00",
+rgbwcommands = {
+    "ON" :   "31 00 00 07 03 01 00 00 00",
     "OFF":   "31 00 00 07 03 02 00 00 00",
     "NIGHT": "31 00 00 07 03 06 00 00 00",
     "WHITE": "31 00 00 07 03 05 00 00 00"
 }
-
+#
+whitecommands = {
+    "ON"        : "31 00 00 01 01 07 00 00 00",
+    "OFF"       : "31 00 00 01 01 08 00 00 00",
+    "NIGHT"     : "31 00 00 01 01 06 00 00 00",
+    "BRIGHTUP"  : "31 00 00 01 01 01 00 00 00",
+    "BRIGHTDOWN": "31 00 00 01 01 02 00 00 00",
+    "TEMPUP"    : "31 00 00 01 01 03 00 00 00",
+    "TEMPDOWN"  : "31 00 00 01 01 04 00 00 00",
+}
 rgbwvarcommands = {
     "BRIGHT"   :  "31 00 00 07 02 ",
     "MODE"     :  "31 00 00 07 04 "
 }
-
-
+''' COLOUR commands
+<- CMD--------------------->  <---------- Colour--->  Zone  Pad   Chksum
+0x31, 0x00, 0x00, 0x07, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x03, 0x00, 0xFF
+ 
+'''
 bridgecommands = {
     "ON":    "31 00 00 00 03 03 00 00 00",
     "OFF":   "31 00 00 00 03 04 00 00 00",
@@ -86,20 +108,13 @@ bridgevarcommands = {
     "MODE"     :  "31 00 00 00 04 "
 }
 
-'''
-varcommands={
-    "RGBBRIGHT"  : "31 00 00 08 03 ", #  untested
-    "LEDBRIGHT"  : "31 00 00 00 02 ", # works
-    "RGBMODE"    : "31 00 00 08 06 ", # original
-    "LEDMODE"    : "31 00 00 00 04 ", # untested
-    "RGBSAT"     : "31 00 00 08 02 ", #  untested
-}
-'''
+
 devices = {
     "BRIDGE" : [bridgecommands,bridgevarcommands], 
-    "RGBW" : [rgbwcommands,rgbwvarcommands],
-    "RAWCOMMANDS" : [rawcommands]
-    } 
+    "RGBW" : [rgbwcommands,rgbwvarcommands], 
+    "RAWCOMMANDS" : [rawcommands],
+    "WHITE" : [whitecommands],
+    }
 
 ######################
 ## iBox v6 commands ##
@@ -109,14 +124,14 @@ def iBoxV6Commands(device, cmd, value):
     if cmd in devices[device][0]:
         return devices[device][0].get(cmd)
     if device=='RAWCOMMANDS':
-        print 'COmmand not found'
+        print 'Command not found'
         return 0
     if cmd in devices[device][1]:
         print "Variable command ", cmd , value
         retval=devices[device][1].get(cmd)+ format(value, "04X")[2:] + " 00 00 00"
         print "Trying ", retval
         return retval
-    print 'COmmand not found'
+    print 'Command not found'
     return 0
     
 
@@ -159,15 +174,18 @@ CMDLINE_INFO = (
 "                           : CMD1 Bulb zone\n"
 "                           : CMD2 Bulb command\n"
 "-------------------------------------------------------------------------------\n"
+" Select the Bulb device    : RAWCOMMANDS RGBW BRIDGE"
 "Select the bulb zone       : 00 01 02 03 04\n"
-"Bulb on/off                : ON OFF NIGHTON WHITEON RGBWON RGBWOFF LEDON LEDOFF\n"
+"RAWCOMMANDS"
+"Bulb on/off                : ON OFF NIGHTON WHITEON\n"
 "Mode Speed up/down         : SPEEDUP SPEEDDOWN\n"
 "Kelvin warmwhite           : WW00 WW25 WW50 WW75 WW100\n"
-"Brightness                 : LEDBRIGHT xx RGBWBRIGHT xx\n"
 "Saturation                 : SATUR00 SATUR25 SATUR50 SATUR75 SATUR100\n"
 "Mode (discomode)           : MODE01 MODE02 MODE03 MODE04 MODE05\n"
 "                           : MODE06 MODE07 MODE08 MODE09\n"
 "Bulb color                 : COLOR001 COLOR002 COLOR003 COLOR004\n"
+"BRIDGE and RGBW            : ON OFF WHITEON MODE X BRIGHT X\n"
+"WHITE commands             : ON OFF WHITEON NIGHTON TEMPUP TEMPDOWN BRIGHTUP BRIGHTDOWN\n"
 )
 
 try:
@@ -183,17 +201,19 @@ try:
     CMDLINE_VALUE1 = 0
     ## check the device exists
     if CMDLINE_DEVICE in devices:
-        print "using device ", CMDLINE_DEVICE
+        print "Using device ", CMDLINE_DEVICE
     else:
-        print "no device found matching", CMDLINE_DEVICE
-        raise # some form of error occurred
+        print "No device found matching", CMDLINE_DEVICE
+        raise SystemExit() 
   
     if CMDLINE_CMD in devices[CMDLINE_DEVICE][0]:
-         print " Static command found ", CMDLINE_CMD
+         print "Static command found ", CMDLINE_CMD
+    
     elif(CMDLINE_CMD in devices[CMDLINE_DEVICE][1]):
         CMDLINE_VALUE1 = int(sys.argv[4].strip())
-        print "[DEBUG] variable command vound           :",CMDLINE_CMD, CMDLINE_VALUE1
-    
+        print "[DEBUG] variable command found           :",CMDLINE_CMD, CMDLINE_VALUE1
+    else:
+        raise SystemExit()
   
 except:
     print CMDLINE_INFO
