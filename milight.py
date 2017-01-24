@@ -17,6 +17,11 @@ live = False
 ###############################################################################################
 
 
+def Hexstr(vals,sep=', '):
+    return'[{}]'.format(sep.join(hex(x) for x in vals))
+
+
+
 #####################
 ## Log to Domoticz ##
 #####################
@@ -33,64 +38,65 @@ def doLog(MSG):
         print "[DEBUG] log error                :", ex
 
 rawcommands = {
-    "COLOR001"       : "31 00 00 08 01 BA BA BA BA",
-    "COLOR002"       : "31 00 00 08 01 FF FF FF FF",
-    "COLOR003"       : "31 00 00 08 01 7A 7A 7A 7A",
-    "COLOR004"       : "31 00 00 08 01 1E 1E 1E 1E",
-    "SATUR00"        : "31 00 00 08 02 64 00 00 00",
-    "SATUR25"        : "31 00 00 08 02 4B 00 00 00",
-    "SATUR50"        : "31 00 00 08 02 32 00 00 00",
-    "SATUR75"        : "31 00 00 08 02 19 00 00 00",
-    "SATUR100"       : "31 00 00 08 02 00 00 00 00",
-    "DIM00"          : "31 00 00 08 03 64 00 00 00",
-    "DIM25"          : "31 00 00 08 03 4B 00 00 00",
-    "DIM50"          : "31 00 00 08 03 32 00 00 00",
-    "DIM75"          : "31 00 00 08 03 19 00 00 00",
-    "DIM100"         : "31 00 00 08 03 00 00 00 00",
-    "ON"             : "31 00 00 08 04 01 00 00 00",
-    "OFF"            : "31 00 00 08 04 02 00 00 00",
-    "SPEEDUP"        : "31 00 00 08 04 03 00 00 00",
-    "SPEEDDOWN"      : "31 00 00 08 04 04 00 00 00",
-    "NIGHTON"        : "31 00 00 08 04 05 00 00 00",
-    "WHITEON"        : "31 00 00 08 05 64 00 00 00",
-    "WW00"           : "31 00 00 08 05 64 00 00 00",
-    "WW25"           : "31 00 00 08 05 4B 00 00 00",
-    "WW50"           : "31 00 00 08 05 32 00 00 00",
-    "WW75"           : "31 00 00 08 05 19 00 00 00",
-    "WW100"          : "31 00 00 08 05 00 00 00 00",
-    "MODE01"         : "31 00 00 08 06 01 00 00 00",
-    "MODE02"         : "31 00 00 08 06 02 00 00 00",
-    "MODE03"         : "31 00 00 08 06 03 00 00 00",
-    "MODE04"         : "31 00 00 08 06 04 00 00 00",
-    "MODE05"         : "31 00 00 08 06 05 00 00 00",
-    "MODE06"         : "31 00 00 08 06 06 00 00 00",
-    "MODE07"         : "31 00 00 08 06 07 00 00 00",
-    "MODE08"         : "31 00 00 08 06 08 00 00 00",
-    "MODE09"         : "31 00 00 08 06 09 00 00 00"
+    "COLOR001"       : [0x31 ,0x00 ,0x00 ,0x08 ,0x01 ,0xBA ,0xBA ,0xBA ,0xBA],
+    "COLOR001"       : [0x31 ,0x00 ,0x00 ,0x08 ,0x01 ,0xBA ,0xBA ,0xBA ,0xBA],
+    "COLOR002"       : [0x31 ,0x00 ,0x00 ,0x08 ,0x01 ,0xFF ,0xFF ,0xFF ,0xFF],
+    "COLOR003"       : [0x31 ,0x00 ,0x00 ,0x08 ,0x01 ,0x7A ,0x7A ,0x7A ,0x7A],
+    "COLOR004"       : [0x31 ,0x00 ,0x00 ,0x08 ,0x01 ,0x1E ,0x1E ,0x1E ,0x1E],
+    "SATUR00"        : [0x31 ,0x00 ,0x00 ,0x08 ,0x02 ,0x64 ,0x00 ,0x00 ,0x00],
+    "SATUR25"        : [0x31 ,0x00 ,0x00 ,0x08 ,0x02 ,0x4B ,0x00 ,0x00 ,0x00],
+    "SATUR50"        : [0x31 ,0x00 ,0x00 ,0x08 ,0x02 ,0x32 ,0x00 ,0x00 ,0x00],
+    "SATUR75"        : [0x31 ,0x00 ,0x00 ,0x08 ,0x02 ,0x19 ,0x00 ,0x00 ,0x00],
+    "SATUR100"       : [0x31 ,0x00 ,0x00 ,0x08 ,0x02 ,0x00 ,0x00 ,0x00 ,0x00],
+    "DIM00"          : [0x31 ,0x00 ,0x00 ,0x08 ,0x03 ,0x64 ,0x00 ,0x00 ,0x00],
+    "DIM25"          : [0x31 ,0x00 ,0x00 ,0x08 ,0x03 ,0x4B ,0x00 ,0x00 ,0x00],
+    "DIM50"          : [0x31 ,0x00 ,0x00 ,0x08 ,0x03 ,0x32 ,0x00 ,0x00 ,0x00],
+    "DIM75"          : [0x31 ,0x00 ,0x00 ,0x08 ,0x03 ,0x19 ,0x00 ,0x00 ,0x00],
+    "DIM100"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x03 ,0x00 ,0x00 ,0x00 ,0x00],
+    "ON"             : [0x31 ,0x00 ,0x00 ,0x08 ,0x04 ,0x01 ,0x00 ,0x00 ,0x00],
+    "OFF"            : [0x31 ,0x00 ,0x00 ,0x08 ,0x04 ,0x02 ,0x00 ,0x00 ,0x00],
+    "SPEEDUP"        : [0x31 ,0x00 ,0x00 ,0x08 ,0x04 ,0x03 ,0x00 ,0x00 ,0x00],
+    "SPEEDDOWN"      : [0x31 ,0x00 ,0x00 ,0x08 ,0x04 ,0x04 ,0x00 ,0x00 ,0x00],
+    "NIGHTON"        : [0x31 ,0x00 ,0x00 ,0x08 ,0x04 ,0x05 ,0x00 ,0x00 ,0x00],
+    "WHITEON"        : [0x31 ,0x00 ,0x00 ,0x08 ,0x05 ,0x64 ,0x00 ,0x00 ,0x00],
+    "WW00"           : [0x31 ,0x00 ,0x00 ,0x08 ,0x05 ,0x64 ,0x00 ,0x00 ,0x00],
+    "WW25"           : [0x31 ,0x00 ,0x00 ,0x08 ,0x05 ,0x4B ,0x00 ,0x00 ,0x00],
+    "WW50"           : [0x31 ,0x00 ,0x00 ,0x08 ,0x05 ,0x32 ,0x00 ,0x00 ,0x00],
+    "WW75"           : [0x31 ,0x00 ,0x00 ,0x08 ,0x05 ,0x19 ,0x00 ,0x00 ,0x00],
+    "WW100"          : [0x31 ,0x00 ,0x00 ,0x08 ,0x05 ,0x00 ,0x00 ,0x00 ,0x00],
+    "MODE01"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x01 ,0x00 ,0x00 ,0x00],
+    "MODE02"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x02 ,0x00 ,0x00 ,0x00],
+    "MODE03"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x03 ,0x00 ,0x00 ,0x00],
+    "MODE04"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x04 ,0x00 ,0x00 ,0x00],
+    "MODE05"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x05 ,0x00 ,0x00 ,0x00],
+    "MODE06"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x06 ,0x00 ,0x00 ,0x00],
+    "MODE07"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x07 ,0x00 ,0x00 ,0x00],
+    "MODE08"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x08 ,0x00 ,0x00 ,0x00],
+    "MODE09"         : [0x31 ,0x00 ,0x00 ,0x08 ,0x06 ,0x09 ,0x00 ,0x00 ,0x00]
 }
 
 
 ###
 # Lets start a tidied way of accessing commands rather than one big list
 rgbwcommands = {
-    "ON" :   "31 00 00 07 03 01 00 00 00",
-    "OFF":   "31 00 00 07 03 02 00 00 00",
-    "NIGHT": "31 00 00 07 03 06 00 00 00",
-    "WHITE": "31 00 00 07 03 05 00 00 00"
+    "ON" :   [0x31, 0x00 ,0x00 ,0x07 ,0x03 ,0x01 ,0x00 ,0x00 ,0x00],
+    "OFF":   [0x31, 0x00 ,0x00 ,0x07 ,0x03 ,0x02 ,0x00 ,0x00 ,0x00],
+    "NIGHT": [0x31, 0x00 ,0x00 ,0x07 ,0x03 ,0x06 ,0x00 ,0x00 ,0x00],
+    "WHITE": [0x31, 0x00 ,0x00 ,0x07 ,0x03 ,0x05 ,0x00 ,0x00 ,0x00]
 }
 #
 whitecommands = {
-    "ON"        : "31 00 00 01 01 07 00 00 00",
-    "OFF"       : "31 00 00 01 01 08 00 00 00",
-    "NIGHT"     : "31 00 00 01 01 06 00 00 00",
-    "BRIGHTUP"  : "31 00 00 01 01 01 00 00 00",
-    "BRIGHTDOWN": "31 00 00 01 01 02 00 00 00",
-    "TEMPUP"    : "31 00 00 01 01 03 00 00 00",
-    "TEMPDOWN"  : "31 00 00 01 01 04 00 00 00",
+    "ON"        : [0x31, 0x00, 0x00, 0x01, 0x01 ,0x07 ,0x00 ,0x00 ,0x00],
+    "OFF"       : [0x31, 0x00, 0x00, 0x01, 0x01 ,0x08 ,0x00 ,0x00 ,0x00],
+    "NIGHT"     : [0x31, 0x00, 0x00, 0x01, 0x01 ,0x06 ,0x00 ,0x00 ,0x00],
+    "BRIGHTUP"  : [0x31, 0x00, 0x00, 0x01, 0x01 ,0x01 ,0x00 ,0x00 ,0x00],
+    "BRIGHTDOWN": [0x31, 0x00, 0x00, 0x01, 0x01 ,0x02 ,0x00 ,0x00 ,0x00],
+    "TEMPUP"    : [0x31, 0x00, 0x00, 0x01, 0x01 ,0x03 ,0x00 ,0x00 ,0x00],
+    "TEMPDOWN"  : [0x31, 0x00, 0x00, 0x01, 0x01 ,0x04 ,0x00 ,0x00 ,0x00],
 }
 rgbwvarcommands = {
-    "BRIGHT"   :  "31 00 00 07 02 ",
-    "MODE"     :  "31 00 00 07 04 "
+    "BRIGHT"   :  [0x31 ,0x00 ,0x00 ,0x07 ,0x02 ],
+    "MODE"     :  [0x31 ,0x00 ,0x00 ,0x07 ,0x04 ]
 }
 ''' COLOUR commands
 <- CMD--------------------->  <---------- Colour--->  Zone  Pad   Chksum
@@ -98,14 +104,14 @@ rgbwvarcommands = {
  
 '''
 bridgecommands = {
-    "ON":    "31 00 00 00 03 03 00 00 00",
-    "OFF":   "31 00 00 00 03 04 00 00 00",
-    "WHITE": "31 00 00 00 03 05 00 00 00"
+    "ON":    [0x31, 0x00, 0x00 ,0x00 ,0x03 ,0x03 ,0x00 ,0x00 ,0x00],
+    "OFF":   [0x31, 0x00, 0x00 ,0x00 ,0x03 ,0x04 ,0x00 ,0x00 ,0x00],
+    "WHITE": [0x31, 0x00, 0x00 ,0x00 ,0x03 ,0x05 ,0x00 ,0x00 ,0x00]
 }
 
 bridgevarcommands = {
-    "BRIGHT"   :  "31 00 00 00 02 ",
-    "MODE"     :  "31 00 00 00 04 "
+    "BRIGHT"   :  [0x31 ,0x00 ,0x00 ,0x00 ,0x02 ],
+    "MODE"     :  [0x31 ,0x00 ,0x00 ,0x00 ,0x04 ]
 }
 
 
@@ -128,7 +134,7 @@ def iBoxV6Commands(device, cmd, value):
         return 0
     if cmd in devices[device][1]:
         print "Variable command ", cmd , value
-        retval=devices[device][1].get(cmd)+ format(value, "04X")[2:] + " 00 00 00"
+        retval=devices[device][1].get(cmd)+ [value] + [ 0x00, 0x00, 0x00]
         print "Trying ", retval
         return retval
     print 'Command not found'
@@ -136,31 +142,16 @@ def iBoxV6Commands(device, cmd, value):
     
 
                                                                                     
-##################
-## Zone builder ##
-##################
-def getZone(data):
-    Zone = 0
-    for x in bytearray.fromhex(data):
-        Zone += x
-    return format(Zone, "04X")[2:]
 
 
-######################
-## Checksum builder ##
-######################
-def getChecksum(data):
-    checksum = 0
-    for x in bytearray.fromhex(data):
-        checksum += x
-    return format(checksum, "04X")[2:]
 
 
 ########################
 ## V6 command builder ##
 ########################
 def V6CommandBuilder(SessionID1, SessionID2, CycleNR, bulbCommand, Zone, checkSum):
-    return "80 00 00 00 11 " + SessionID1 + " " + SessionID2 + " 00 " + CycleNR + " 00 " + bulbCommand + " " + Zone + " 00 " + checkSum
+    preamble = [0x80 ,0x00 ,0x00 ,0x00 ,0x11]
+    return preamble+[SessionID1,SessionID2,0x00 ,CycleNR,0x00] +bulbCommand + [Zone, 0x00, checkSum]
 
 
 ##########################
@@ -192,7 +183,7 @@ try:
     CMDLINE_DEVICE = sys.argv[1].strip()
     print "[DEBUG] target           :", CMDLINE_DEVICE
     
-    CMDLINE_ZONE = sys.argv[2].strip()
+    CMDLINE_ZONE = int(sys.argv[2].strip())
     print "[DEBUG] ZONE           :", CMDLINE_ZONE
 
     CMDLINE_CMD = sys.argv[3].strip()
@@ -218,7 +209,9 @@ try:
 except:
     print CMDLINE_INFO
     raise SystemExit()
-doLog("Milight Script: Starting... (milight.py " + CMDLINE_ZONE + " " + CMDLINE_CMD + ")")
+#doLog("Milight Script: Starting... (milight.py " + CMDLINE_ZONE + " " + CMDLINE_CMD + ")")
+
+
 
 
 ###################
@@ -227,7 +220,7 @@ doLog("Milight Script: Starting... (milight.py " + CMDLINE_ZONE + " " + CMDLINE_
 Session = False
 for iCount in range(0, UDP_MAX_TRY):
     try:
-        START_SESSION = "20 00 00 00 16 02 62 3A D5 ED A3 01 AE 08 2D 46 61 41 A7 F6 DC AF D3 E6 00 00 1E"
+        START_SESSION = bytearray([0x20, 0x00 , 0x00 , 0x00 , 0x16 , 0x02 , 0x62 , 0x3A , 0xD5 , 0xED , 0xA3 , 0x01 , 0xAE , 0x08 , 0x2D , 0x46 , 0x61 , 0x41 , 0xA7 , 0xF6 , 0xDC , 0xAF , 0xD3 , 0xE6 , 0x00 , 0x00 , 0x1E])
         doLog("Milight Script: Setting up ibox session...")
         if live==True:
             sockServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -236,15 +229,13 @@ for iCount in range(0, UDP_MAX_TRY):
             sockServer.settimeout(UDP_TIMEOUT)
             sockServer.sendto(bytearray.fromhex(START_SESSION), (IBOX_IP, UDP_PORT_SEND))
             dataReceived, addr = sockServer.recvfrom(1024)
-            dataResponse = str(dataReceived.encode('hex')).upper()
-            SessionID1 = dataResponse[38:40]
-            SessionID2 = dataResponse[40:42]
+            
         else:
             doLog("Fake it")
-            dataResponse= " No server so faking it"
-            SessionID1 = "BA"
-            SessionID2 = "BE"
-        print "[DEBUG] received session message :", dataResponse
+            dataReceived = [0x28 ,0x00, 0x00 ,0x00 ,0x11 ,0x00 ,0x02 ,0xAC ,0xCF ,0x23 ,0xF5 ,0x7A ,0xD4 ,0x69 ,0xF0 ,0x3C ,0x23 ,0x00 ,0x01 ,0x05 ,0x00 ,0x00]
+        SessionID1 = dataReceived[19]
+        SessionID2 = dataReceived[20]
+        print "[DEBUG] received session message :",Hexstr(dataReceived,' ')
         print "[DEBUG] sessionID1               :", SessionID1
         print "[DEBUG] sessionID2               :", SessionID2
         Session = True
@@ -267,31 +258,31 @@ for iCount in range(0, UDP_MAX_TRY):
 if Session == True:
     for iCount in range(0, UDP_MAX_TRY):
         try:
-            CycleNR = format(iCount, "04X")[2:]
+            CycleNR = iCount
             print "[DEBUG] cycle number             :", CycleNR
 
             bulbCommand = iBoxV6Commands(CMDLINE_DEVICE ,CMDLINE_CMD , CMDLINE_VALUE1)
-            print "[DEBUG] light command            :", bulbCommand
+            print "[DEBUG] light command            :", Hexstr(bulbCommand,' ')
+            
 
-            useZone = getZone(CMDLINE_ZONE)
+            useZone = CMDLINE_ZONE
             print "[DEBUG] zone                     :", useZone
 
-            Checksum = getChecksum(bulbCommand + " " + useZone + " 00")
+            Checksum = sum(bulbCommand) & 0xff
             print "[DEBUG] checksum                 :", Checksum
 
             sendCommand = V6CommandBuilder(SessionID1, SessionID2, CycleNR, bulbCommand, useZone, Checksum)                     
-            print "[DEBUG] sending command          :", sendCommand
-            doLog("Milight Script: Sending command: " + sendCommand)
+            print "[DEBUG] sending command          :",Hexstr(sendCommand,' ') 
+#            doLog("Milight Script: Sending command: " + sendCommand)
             if live:
                 sockServer.sendto(bytearray.fromhex(sendCommand), (IBOX_IP, UDP_PORT_SEND))
                 dataReceived, addr = sockServer.recvfrom(1024)
-                dataResponse = str(dataReceived.encode('hex')).upper()
-                print "[DEBUG] received message         :", dataResponse
+                print "[DEBUG] received message         :", Hexstr(dataResponse,' ')
                 doLog("Milight Script: Receiving response: " + dataResponse)
             break
 
         except socket.timeout:
-            print "[DEBUG] timeout on command       :", sendCommand
+            print "[DEBUG] timeout on command       :", Hexstr( sendCommand,' ')
             doLog("Milight Script: Timeout on command... doing a retry")
             continue
 
