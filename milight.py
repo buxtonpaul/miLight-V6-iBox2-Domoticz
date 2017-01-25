@@ -13,7 +13,7 @@ UDP_TIMEOUT = 5                 # Wait for data in sec
 DOMOTICZ_IP = "192.168.0.35"    # Domoticz IP only needed for logging
 DOMOTICZ_PORT = "80"            # Domoticz port only needed for logging
 DOMOTICZ_LOG = 0                # Turn logging to Domoticz on/off 0=off and 1=on
-live = False
+live = True
 ###############################################################################################
 
 
@@ -33,9 +33,9 @@ def doLog(MSG):
                             "/json.htm?type=command&param=addlogmessage&message="
                             +MSG.replace(" ", "%20")).read()
         else:
-            print "DEBUG ", MSG
+            print "DEBUG: ", MSG
     except Exception as ex:
-        print "[DEBUG] log error                :", ex
+        print "[DEBUG] log error: ", ex
 
 rawcommands = {
     "COLOR001"       : [0x31 ,0x00 ,0x00 ,0x08 ,0x01 ,0xBA ,0xBA ,0xBA ,0xBA],
@@ -130,14 +130,14 @@ def iBoxV6Commands(device, cmd, value):
     if cmd in devices[device][0]:
         return devices[device][0].get(cmd)
     if device=='RAWCOMMANDS':
-        print 'Command not found'
+        doLog('Command not found:{cmd}'.format(cmd=cmd))
         return 0
     if cmd in devices[device][1]:
-        print "Variable command ", cmd , value
+        doLog ("Variable command: {cmd} {value}".format(cmd=cmd , value=value))
         retval=devices[device][1].get(cmd)+ [value] + [ 0x00, 0x00, 0x00]
-        print "Trying ", retval
+        doLog( "Trying: {command}".format(command=Hexstr(retval)))
         return retval
-    print 'Command not found'
+    doLog('Command not found')
     return 0
     
 
@@ -181,36 +181,37 @@ CMDLINE_INFO = (
 
 try:
     CMDLINE_DEVICE = sys.argv[1].strip()
-    print "[DEBUG] target           :", CMDLINE_DEVICE
+    doLog( "Target: {target}".format(target= CMDLINE_DEVICE))
     
     CMDLINE_ZONE = int(sys.argv[2].strip())
-    print "[DEBUG] ZONE           :", CMDLINE_ZONE
+    doLog("ZONE: {zone}".format(zone= CMDLINE_ZONE))
 
     CMDLINE_CMD = sys.argv[3].strip()
-    print "[DEBUG] CMD           :", CMDLINE_CMD
+    doLog( "CMD : {cmd}".format(cmd= CMDLINE_CMD))
     
     CMDLINE_VALUE1 = 0
     ## check the device exists
     if CMDLINE_DEVICE in devices:
-        print "Using device ", CMDLINE_DEVICE
+        doLog("Using device: {device}".format(device= CMDLINE_DEVICE))
     else:
-        print "No device found matching", CMDLINE_DEVICE
+        doLog("No device found matching: {device}".format(device= CMDLINE_DEVICE))
         raise SystemExit() 
   
     if CMDLINE_CMD in devices[CMDLINE_DEVICE][0]:
-         print "Static command found ", CMDLINE_CMD
+         doLog("Static command found: {cmd}".format(cmd= CMDLINE_CMD))
     
     elif(CMDLINE_CMD in devices[CMDLINE_DEVICE][1]):
+        doLog("Checking variable command {cmd}".format(cmd=CMDLINE_CMD))
         CMDLINE_VALUE1 = int(sys.argv[4].strip())
-        print "[DEBUG] variable command found           :",CMDLINE_CMD, CMDLINE_VALUE1
+        doLog("Variable command found: {cmd} {var}".format(cmd=CMDLINE_CMD, var=CMDLINE_VALUE1))
     else:
+        
         raise SystemExit()
   
 except:
+    doLog("Valid command not found")
     print CMDLINE_INFO
     raise SystemExit()
-#doLog("Milight Script: Starting... (milight.py " + CMDLINE_ZONE + " " + CMDLINE_CMD + ")")
-
 
 
 
@@ -235,21 +236,22 @@ for iCount in range(0, UDP_MAX_TRY):
             dataReceived = [0x28 ,0x00, 0x00 ,0x00 ,0x11 ,0x00 ,0x02 ,0xAC ,0xCF ,0x23 ,0xF5 ,0x7A ,0xD4 ,0x69 ,0xF0 ,0x3C ,0x23 ,0x00 ,0x01 ,0x05 ,0x00 ,0x00]
         SessionID1 = dataReceived[19]
         SessionID2 = dataReceived[20]
-        print "[DEBUG] received session message :",Hexstr(dataReceived,' ')
-        print "[DEBUG] sessionID1               :", SessionID1
-        print "[DEBUG] sessionID2               :", SessionID2
+        doLog( "Received session message: {message}".format(message=Hexstr(dataReceived,' ')))
+        doLog("SessionID1: {session1}".format( session1=SessionID1))
+        doLog("SessionID2: {session1}".format( session1=SessionID2))
+        
         Session = True
         break
 
     except socket.timeout:
-        print "[DEBUG] timeout on session start :", START_SESSION
+        print "Timeout on session start: ", START_SESSION
         doLog("Milight Script: Timeout on command... doing a retry")
         sockServer.close()
         continue
 
     except Exception as ex:
-        print "[DEBUG] something's wrong        :", ex 
-        doLog("Milight Script: Something's wrong with the session...")
+        
+        doLog("Milight Script: Something's wrong with the session...{}".format(ex))
 
 
 #######################
@@ -259,36 +261,32 @@ if Session == True:
     for iCount in range(0, UDP_MAX_TRY):
         try:
             CycleNR = iCount
-            print "[DEBUG] cycle number             :", CycleNR
-
-            bulbCommand = iBoxV6Commands(CMDLINE_DEVICE ,CMDLINE_CMD , CMDLINE_VALUE1)
-            print "[DEBUG] light command            :", Hexstr(bulbCommand,' ')
+            doLog ("Cycle number: {cycle}".format( cycle=CycleNR))
             
-
+            bulbCommand = iBoxV6Commands(CMDLINE_DEVICE ,CMDLINE_CMD , CMDLINE_VALUE1)
+            doLog ("Light command: {Command}".format(Command=Hexstr(bulbCommand,' ')))
+         
             useZone = CMDLINE_ZONE
-            print "[DEBUG] zone                     :", useZone
+            doLog ("Zone: {Zone}".format(Zone= useZone))
 
             Checksum = sum(bulbCommand) & 0xff
-            print "[DEBUG] checksum                 :", Checksum
+            doLog ("Checksum: {checksum}".format( checksum=Checksum))
 
-            sendCommand = V6CommandBuilder(SessionID1, SessionID2, CycleNR, bulbCommand, useZone, Checksum)                     
-            print "[DEBUG] sending command          :",Hexstr(sendCommand,' ') 
-#            doLog("Milight Script: Sending command: " + sendCommand)
+            sendCommand = V6CommandBuilder(SessionID1, SessionID2, CycleNR, bulbCommand, useZone, Checksum)                          
+            doLog("Milight Script: Sending command: {command}".format(command=Hexstr(sendCommand,' ')))
+
             if live:
                 sockServer.sendto(bytearray.fromhex(sendCommand), (IBOX_IP, UDP_PORT_SEND))
                 dataReceived, addr = sockServer.recvfrom(1024)
-                print "[DEBUG] received message         :", Hexstr(dataResponse,' ')
-                doLog("Milight Script: Receiving response: " + dataResponse)
+                doLog("Milight Script: Receiving response: {response}".format(response=Hexstr(dataResponse,' ')))
             break
 
         except socket.timeout:
-            print "[DEBUG] timeout on command       :", Hexstr( sendCommand,' ')
-            doLog("Milight Script: Timeout on command... doing a retry")
+            doLog ("Timeout on command: {command}     ".format(command= Hexstr( sendCommand,' ')))
             continue
 
         except Exception as ex:
-            print "[DEBUG] something's wrong        :", ex
-            doLog("Milight Script: Something's wrong with te command...")
+            doLog("Milight Script: Something's wrong with the command...{}".format(ex))
 
         finally:
             if live:
