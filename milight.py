@@ -17,8 +17,9 @@ live = True
 ###############################################################################################
 
 
-def Hexstr(vals, sep=', '):
-    ''' Print the provided list as a hex string, using the optional seperator to determine how they are seperated'''
+def hexstr(vals, sep=', '):
+    ''' Print the provided list as a hex string, using
+    the optional seperator to determine how they are seperated'''
     return'[{}]'.format(sep.join(hex(x) for x in vals))
 
 
@@ -26,19 +27,19 @@ def Hexstr(vals, sep=', '):
 #####################
 ## Log to Domoticz ##
 #####################
-def doLog(MSG):
+def dolog(msg):
     ''' Log a message to Domoticz'''
     try:
         if DOMOTICZ_LOG == 1:
             urllib2.urlopen("http://"+DOMOTICZ_IP+":"+DOMOTICZ_PORT+
                             "/json.htm?type=command&param=addlogmessage&message="
-                            +MSG.replace(" ", "%20")).read()
+                            +msg.replace(" ", "%20")).read()
         else:
-            print "DEBUG: ", MSG
+            print "DEBUG: ", msg
     except Exception as ex:
         print "[DEBUG] log error: ", ex
 
-rawcommands = {
+RAWCOMMANDS = {
     "COLOR001"       : [0x31, 0x00, 0x00, 0x08, 0x01, 0xBA, 0xBA, 0xBA, 0xBA],
     "COLOR001"       : [0x31, 0x00, 0x00, 0x08, 0x01, 0xBA, 0xBA, 0xBA, 0xBA],
     "COLOR002"       : [0x31, 0x00, 0x00, 0x08, 0x01, 0xFF, 0xFF, 0xFF, 0xFF],
@@ -79,14 +80,14 @@ rawcommands = {
 
 ###
 # Lets start a tidied way of accessing commands rather than one big list
-rgbwcommands = {
+RGBWCOMMANDS = {
     "ON" :   [0x31, 0x00, 0x00, 0x07, 0x03, 0x01, 0x00, 0x00, 0x00],
     "OFF":   [0x31, 0x00, 0x00, 0x07, 0x03, 0x02, 0x00, 0x00, 0x00],
     "NIGHT": [0x31, 0x00, 0x00, 0x07, 0x03, 0x06, 0x00, 0x00, 0x00],
     "WHITE": [0x31, 0x00, 0x00, 0x07, 0x03, 0x05, 0x00, 0x00, 0x00]
 }
 #
-whitecommands = {
+WHITECOMMANDS = {
     "ON"        : [0x31, 0x00, 0x00, 0x01, 0x01, 0x07, 0x00, 0x00, 0x00],
     "OFF"       : [0x31, 0x00, 0x00, 0x01, 0x01, 0x08, 0x00, 0x00, 0x00],
     "NIGHT"     : [0x31, 0x00, 0x00, 0x01, 0x01, 0x06, 0x00, 0x00, 0x00],
@@ -95,7 +96,7 @@ whitecommands = {
     "TEMPUP"    : [0x31, 0x00, 0x00, 0x01, 0x01, 0x03, 0x00, 0x00, 0x00],
     "TEMPDOWN"  : [0x31, 0x00, 0x00, 0x01, 0x01, 0x04, 0x00, 0x00, 0x00],
 }
-rgbwvarcommands = {
+RGBWVARCOMMANDS = {
     "BRIGHT"   : [0x31, 0x00, 0x00, 0x07, 0x02],
     "MODE"     : [0x31, 0x00, 0x00, 0x07, 0x04]
 }
@@ -104,23 +105,23 @@ rgbwvarcommands = {
 ###0x31, 0x00, 0x00, 0x07, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x03, 0x00, 0xFF
 ###
 
-bridgecommands = {
+BRIDGECOMMANDS = {
     "ON":    [0x31, 0x00, 0x00, 0x00, 0x03, 0x03, 0x00, 0x00, 0x00],
     "OFF":   [0x31, 0x00, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00],
     "WHITE": [0x31, 0x00, 0x00, 0x00, 0x03, 0x05, 0x00, 0x00, 0x00]
 }
 
-bridgevarcommands = {
+BRIDGEVARCOMMANDS = {
     "BRIGHT"   :  [0x31, 0x00, 0x00, 0x00, 0x02],
     "MODE"     :  [0x31, 0x00, 0x00, 0x00, 0x04]
 }
 
 
-devices = {
-    "BRIDGE" : [bridgecommands, bridgevarcommands],
-    "RGBW" : [rgbwcommands, rgbwvarcommands],
-    "RAWCOMMANDS" : [rawcommands],
-    "WHITE" : [whitecommands],
+DEVICES = {
+    "BRIDGE" : [BRIDGECOMMANDS, BRIDGEVARCOMMANDS],
+    "RGBW" : [RGBWCOMMANDS, RGBWVARCOMMANDS],
+    "RAWCOMMANDS" : [RAWCOMMANDS],
+    "WHITE" : [WHITECOMMANDS],
     }
 
 ######################
@@ -128,17 +129,18 @@ devices = {
 ######################
 
 def iBoxV6Commands(device, cmd, value):
-    if cmd in devices[device][0]:
-        return devices[device][0].get(cmd)
+    ''' Construct a MiLightBox command from the device command and value '''
+    if cmd in DEVICES[device][0]:
+        return DEVICES[device][0].get(cmd)
     if device == 'RAWCOMMANDS':
-        doLog('Command not found:{cmd}'.format(cmd=cmd))
+        dolog('Command not found:{cmd}'.format(cmd=cmd))
         return 0
-    if cmd in devices[device][1]:
-        doLog("Variable command: {cmd} {value}".format(cmd=cmd, value=value))
-        retval = devices[device][1].get(cmd)+ [value] + [0x00, 0x00, 0x00]
-        doLog("Trying: {command}".format(command=Hexstr(retval)))
+    if cmd in DEVICES[device][1]:
+        dolog("Variable command: {cmd} {value}".format(cmd=cmd, value=value))
+        retval = DEVICES[device][1].get(cmd)+ [value] + [0x00, 0x00, 0x00]
+        dolog("Trying: {command}".format(command=hexstr(retval)))
         return retval
-    doLog('Command not found')
+    dolog('Command not found')
     return 0
 
 
@@ -180,29 +182,29 @@ CMDLINE_INFO = (
 
 try:
     CMDLINE_DEVICE = sys.argv[1].strip()
-    doLog("Target: {target}".format(target=CMDLINE_DEVICE))
+    dolog("Target: {target}".format(target=CMDLINE_DEVICE))
     CMDLINE_ZONE = int(sys.argv[2].strip())
-    doLog("ZONE: {zone}".format(zone=CMDLINE_ZONE))
+    dolog("ZONE: {zone}".format(zone=CMDLINE_ZONE))
 
     CMDLINE_CMD = sys.argv[3].strip()
-    doLog("CMD : {cmd}".format(cmd=CMDLINE_CMD))
+    dolog("CMD : {cmd}".format(cmd=CMDLINE_CMD))
     CMDLINE_VALUE1 = 0
     ## check the device exists
-    if CMDLINE_DEVICE in devices:
-        doLog("Using device: {device}".format(device=CMDLINE_DEVICE))
+    if CMDLINE_DEVICE in DEVICES:
+        dolog("Using device: {device}".format(device=CMDLINE_DEVICE))
     else:
-        doLog("No device found matching: {device}".format(device=CMDLINE_DEVICE))
+        dolog("No device found matching: {device}".format(device=CMDLINE_DEVICE))
         raise SystemExit()
-    if CMDLINE_CMD in devices[CMDLINE_DEVICE][0]:
-        doLog("Static command found: {cmd}".format(cmd=CMDLINE_CMD))
-    elif CMDLINE_CMD in devices[CMDLINE_DEVICE][1]:
-        doLog("Checking variable command {cmd}".format(cmd=CMDLINE_CMD))
+    if CMDLINE_CMD in DEVICES[CMDLINE_DEVICE][0]:
+        dolog("Static command found: {cmd}".format(cmd=CMDLINE_CMD))
+    elif CMDLINE_CMD in DEVICES[CMDLINE_DEVICE][1]:
+        dolog("Checking variable command {cmd}".format(cmd=CMDLINE_CMD))
         CMDLINE_VALUE1 = int(sys.argv[4].strip())
-        doLog("Variable command found: {cmd} {var}".format(cmd=CMDLINE_CMD, var=CMDLINE_VALUE1))
+        dolog("Variable command found: {cmd} {var}".format(cmd=CMDLINE_CMD, var=CMDLINE_VALUE1))
     else:
         raise SystemExit()
 except:
-    doLog("Valid command not found")
+    dolog("Valid command not found")
     print CMDLINE_INFO
     raise SystemExit()
 
@@ -218,35 +220,35 @@ for iCount in range(0, UDP_MAX_TRY):
                                    0x3A, 0xD5, 0xED, 0xA3, 0x01, 0xAE, 0x08,
                                    0x2D, 0x46, 0x61, 0x41, 0xA7, 0xF6, 0xDC,
                                    0xAF, 0xD3, 0xE6, 0x00, 0x00, 0x1E])
-        doLog("Milight Script: Setting up ibox session...")
+        dolog("Milight Script: Setting up ibox session...")
         if live:
             sockServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sockServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sockServer.bind(('', UDP_PORT_RECEIVE))
             sockServer.settimeout(UDP_TIMEOUT)
-            sockServer.sendto(bytearray.fromhex(START_SESSION), (IBOX_IP, UDP_PORT_SEND))
+            sockServer.sendto(START_SESSION, (IBOX_IP, UDP_PORT_SEND))
             dataReceived, addr = sockServer.recvfrom(1024)
         else:
-            doLog("Fake it")
+            dolog("Fake it")
             dataReceived = [0x28, 0x00, 0x00, 0x00, 0x11, 0x00, 0x02, 0xAC, 0xCF,
                             0x23, 0xF5, 0x7A, 0xD4, 0x69, 0xF0, 0x3C, 0x23, 0x00,
                             0x01, 0x05, 0x00, 0x00]
         SessionID1 = dataReceived[19]
         SessionID2 = dataReceived[20]
-        doLog("Received session message: {message}".format(message=Hexstr(dataReceived, ' ')))
-        doLog("SessionID1: {session1}".format(session1=SessionID1))
-        doLog("SessionID2: {session1}".format(session1=SessionID2))
+        dolog("Received session message: {message}".format(message=hexstr(dataReceived, ' ')))
+        dolog("SessionID1: {session1}".format(session1=SessionID1))
+        dolog("SessionID2: {session1}".format(session1=SessionID2))
         lightSession = True
         break
 
     except socket.timeout:
         print "Timeout on session start: ", START_SESSION
-        doLog("Milight Script: Timeout on command... doing a retry")
+        dolog("Milight Script: Timeout on command... doing a retry")
         sockServer.close()
         continue
 
-    except Exception as ex:
-        doLog("Milight Script: Something's wrong with the session...{}".format(ex))
+#    except Exception as ex:
+#        dolog("Milight Script: Something's wrong with the session...{}".format(ex))
 
 
 #######################
@@ -256,31 +258,31 @@ if lightSession == True:
     for iCount in range(0, UDP_MAX_TRY):
         try:
             CycleNR = iCount
-            doLog("Cycle number: {cycle}".format(cycle=CycleNR))
+            dolog("Cycle number: {cycle}".format(cycle=CycleNR))
             bulbCommand = iBoxV6Commands(CMDLINE_DEVICE, CMDLINE_CMD, CMDLINE_VALUE1)
-            doLog("Light command: {Command}".format(Command=Hexstr(bulbCommand, ' ')))
+            dolog("Light command: {Command}".format(Command=hexstr(bulbCommand, ' ')))
             useZone = CMDLINE_ZONE
-            doLog("Zone: {Zone}".format(Zone=useZone))
+            dolog("Zone: {Zone}".format(Zone=useZone))
 
             Checksum = sum(bulbCommand) & 0xff
-            doLog("Checksum: {checksum}".format(checksum=Checksum))
+            dolog("Checksum: {checksum}".format(checksum=Checksum))
 
             sendCommand = V6CommandBuilder(SessionID1, SessionID2,
                                            CycleNR, bulbCommand, useZone, Checksum)
-            doLog("Sending command: {command}".format(command=Hexstr(sendCommand, ' ')))
+            dolog("Sending command: {command}".format(command=hexstr(sendCommand, ' ')))
 
             if live:
                 sockServer.sendto(bytearray.fromhex(sendCommand), (IBOX_IP, UDP_PORT_SEND))
                 dataReceived, addr = sockServer.recvfrom(1024)
-                doLog("Receiving response: {response}".format(response=Hexstr(dataResponse, ' ')))
+                dolog("Receiving response: {response}".format(response=hexstr(dataResponse, ' ')))
             break
 
         except socket.timeout:
-            doLog("Timeout on command: {command}".format(command=Hexstr(sendCommand, ' ')))
+            dolog("Timeout on command: {command}".format(command=hexstr(sendCommand, ' ')))
             continue
 
-        except Exception as ex:
-            doLog("Milight Script: Something's wrong with the command...{}".format(ex))
+ #       except Exception as ex:
+ #           dolog("Milight Script: Something's wrong with the command...{}".format(ex))
 
         finally:
             if live:
@@ -289,6 +291,6 @@ else:
     if live:
         sockServer.close()
 
-doLog("Milight Script: Ready...")
+dolog("Milight Script: Ready...")
 
 raise SystemExit()
